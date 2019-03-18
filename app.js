@@ -3,6 +3,11 @@ const BodyParser = require("body-parser");
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectID;
 
+// GRAPHQL
+const graphqlHTTP = require('express-graphql');
+const {GraphQLSchema} = require('graphql');
+const {queryType} = require('./query.js');
+const schema = new GraphQLSchema({query: queryType});
 
 const CONNECTION_URL = "mongodb+srv://denzel:abc@hongducta-movies-eevor.mongodb.net/test?retryWrites=true";
 const DATABASE_NAME = "denzel";
@@ -18,6 +23,11 @@ function randomIntFromInterval(min,max)
 var app = Express();
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: true }));
+
+app.use('/graphql',graphqlHTTP({
+  schema: schema,
+  graphiql: true
+}))
 
 const imdb = require('./src/imdb');
 const DENZEL_IMDB_ID = 'nm0000243'; // id of Denzel. Do not change
@@ -51,6 +61,10 @@ app.listen(9292, () => {
     client.close();
   });
 });
+
+app.get('/hello',function (req,res){
+  res.send("hello");
+})
 
 app.get('/movies/populate', function (req, res) {
   const file = fs.readFileSync("filmography.json");
