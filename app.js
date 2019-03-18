@@ -96,11 +96,26 @@ app.get('/movies', function (req, res) {
 })
 
 app.get('/movies/search', function (req, res) {
-  res.send('Get movies search');
+  
 })
 
 app.get('/movies/:id', function (req, res) {
-  res.send('Fetch a specific movie.' + req.params.id);
+  const id = req.params.id
+  MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
+    if (error) {
+      throw error;
+    }
+    const database = client.db(DATABASE_NAME);
+    const collection = database.collection("imdb");
+    collection.findOne({id: id}, function(err,result){
+      if (err)
+      {
+        res.send(err);
+      }
+      res.send(result);
+    })
+    client.close();
+  });
 })
 
 app.post('/movies/:id', function (req, res) {
