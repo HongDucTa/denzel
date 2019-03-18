@@ -7,6 +7,12 @@ const ObjectId = require("mongodb").ObjectID;
 const CONNECTION_URL = "mongodb+srv://denzel:abc@hongducta-movies-eevor.mongodb.net/test?retryWrites=true";
 const DATABASE_NAME = "denzel";
 
+function randomIntFromInterval(min,max)
+{
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+
 
 
 var app = Express();
@@ -67,7 +73,26 @@ app.get('/movies/populate', function (req, res) {
 })
 
 app.get('/movies', function (req, res) {
-  res.send('Fetch a random must-watch movie.');
+  MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
+    if (error) {
+      throw error;
+    }
+    const database = client.db(DATABASE_NAME);
+    const collection = database.collection("imdb");
+    const result = collection.find().toArray(function (error,results){
+      if (error)
+      {
+        res.send(error);
+      }
+      else
+      {
+        const len = results.length;
+        const index = randomIntFromInterval(0,len - 1);
+        res.send(results[index]);
+      }
+    });
+    client.close();
+  });
 })
 
 app.get('/movies/search', function (req, res) {
