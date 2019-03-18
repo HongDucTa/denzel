@@ -96,11 +96,31 @@ app.get('/movies', function (req, res) {
 })
 
 app.get('/movies/search', function (req, res) {
+  const limit = req.query.limit;
+  const metascore = req.query.metascore;
+  MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
+    if (error) {
+      throw error;
+    }
+    const database = client.db(DATABASE_NAME);
+    const collection = database.collection("imdb");
+    collection.find({metascore: {$gte: Number(metascore)}}).sort({metascore: -1}).limit(Number(limit)).toArray(function(err,results){
+      if (err)
+      {
+        res.send(err);
+      }
+      else
+      {
+        res.send(results);
+      }
+    })
+    client.close();
+  });
   
 })
 
 app.get('/movies/:id', function (req, res) {
-  const id = req.params.id
+  const id = req.params.id;
   MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
     if (error) {
       throw error;
