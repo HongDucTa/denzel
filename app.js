@@ -139,5 +139,17 @@ app.get('/movies/:id', function (req, res) {
 })
 
 app.post('/movies/:id', function (req, res) {
-  res.send(req.params.id + '\n' + String(req.query));
+  const id = req.params.id;
+  const date = req.query.date;
+  const review = req.query.review;
+  MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
+    if (error) {
+      throw error;
+    }
+    const database = client.db(DATABASE_NAME);
+    const collection = database.collection("imdb");
+    collection.update({id: id},{$set: {date: date,review: review}});
+    client.close();
+  });
+  res.send("Date and review updated !");
 })
