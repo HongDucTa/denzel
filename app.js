@@ -38,9 +38,11 @@ async function fetchFilmography(actor) {
   try {
     console.log(`📽️  fetching filmography of ${actor}...`);
     const movies = await imdb(actor);
-    const awesome = movies.filter(movie => movie.metascore >= 70);
+    const awesome = movies.filter(movie => movie.metascore >= 0);
 
     fs.writeFileSync('filmography.json', JSON.stringify(awesome, null, 2));
+    //fs.writeFileSync('filmography.json', JSON.stringify(movies, null, 2));
+
     console.log("Done !");
     process.exit(0);
   } catch (e) {
@@ -61,10 +63,6 @@ app.listen(9292, () => {
     client.close();
   });
 });
-
-app.get('/hello',function (req,res){
-  res.send("hello");
-})
 
 app.get('/movies/populate', function (req, res) {
   const file = fs.readFileSync("filmography.json");
@@ -110,8 +108,16 @@ app.get('/movies', function (req, res) {
 })
 
 app.get('/movies/search', function (req, res) {
-  const limit = req.query.limit;
-  const metascore = req.query.metascore;
+  var limit = req.query.limit;
+  var metascore = req.query.metascore;
+  if (limit == undefined)
+  {
+    limit = 5;
+  }
+  if (metascore == undefined)
+  {
+    metascore = 0;
+  }
   MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
     if (error) {
       throw error;
