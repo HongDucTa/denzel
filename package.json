@@ -2,6 +2,10 @@
   "name": "denzel",
   "version": "0.0.1",
   "description": "The must-watch Denzel's movies",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^6.2.0",
